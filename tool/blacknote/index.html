@@ -1,0 +1,282 @@
+<html>
+<style>
+textarea{
+    font-size:28px;
+    padding:20px; margin:0; border:none;
+    width:100%; height:100%;
+    text-align:center;
+    font-family:sans-serif;
+    background:black; color:white;
+    resize:none;
+}
+body{
+    margin:0;
+    background:black; color:white;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>黒メモ</title>
+</head>
+<body>
+    <textarea></textarea>
+<script>
+    const title_left = "黒メモ";
+    const title_sp = " | ";
+    const title_elm = document.querySelector('title');
+    var fileHandle = null;
+    var idi="fs", bf=null, cd=0, cdl=["UTF-8","Shift-JIS"];
+    var elm = document.querySelector('textarea'), textareaMode = elm.tagName === 'TEXTAREA';
+    var pdlrMode = 0;
+    var rewrite_flag=false;
+    var ssv=location.protocol==='data:', dsv=false, nsv="保存はページ表示ごとに1度だけです";
+    var getSetElmValue = (v)=>{
+        if (typeof(v) !== 'undefined') {
+            if (textareaMode) {
+                elm.value=v;
+            } else {
+                elm.innerText=v;
+            }
+        }
+        if (textareaMode) {
+            return elm.value;
+        } else {
+            return elm.innerText;
+        }
+    }
+    const textFileOptions = {
+        types: [
+            {
+                description: "Text Files",
+                accept: {
+                    "text/plain": [".txt", ".text", ".md"],
+                },
+            },
+        ],
+    };
+    function BeforeCloseEvent(){
+        if(!rewrite_flag||confirm("行った変更が保存されない可能性があります。\nそれでも閉じますか？")){
+            return true;
+        }
+        return false;
+    }
+    window.onbeforeunload = function(e) {
+        if(rewrite_flag)return true;
+    };
+    function setBF(file) {
+        if(typeof(file)!=="undefined")bf=file;
+        rewrite_flag = false;
+        if(bf===null) {
+            fileHandle=null;
+            delete document.body.dataset.filename;
+            title_elm.innerText=title_left;
+            getSetElmValue("");
+        }else{
+            title_elm.innerText=title_left+title_sp+bf.name;
+            document.body.dataset.filename=bf.name
+        }
+        return bf;
+    }
+    function LoadFile(t,_cd){
+        var file;
+        if(t===null) { return } else {
+            if (typeof(t.files) === 'undefined') {
+                file=t;
+            } else {
+                file=t.files[0];
+            }
+        };
+        if(typeof(_cd)!=="number") _cd=cd;
+        var rd=new FileReader(), ec=cdl[_cd];
+        rd.readAsText(file,ec);
+        rd.onload=(e)=>{
+            getSetElmValue(rd.result);
+        }
+    }
+    function getLogDateName() {
+        const d=new Date()
+        return "log"+d.getFullYear()+("0"+(d.getMonth() + 1)).slice(-2)+("0"+d.getDate()).slice(-2)+"_"+("0"+d.getHours()).slice(-2)+("0"+d.getMinutes()).slice(-2)+".txt";
+    }
+    async function fsv() {
+        var sn='', sndfn=document.body.dataset.filename;
+        if(typeof(sndfn)!=='undefined')sn=sndfn;
+        if(sn==='') sn=getLogDateName();
+        if(typeof(window.showOpenFilePicker) === 'undefined') {
+            if(dsv){alert(nsv);}
+            else if(confirm("テキストの内容を保存しますか？\n保存名>> "+sn+(ssv?('\n('+nsv+')'):''))){
+                var text = getSetElmValue();
+                var b=new Blob([text],{type:"text/plane"});
+                var a=document.createElement("a");
+                a.href=URL.createObjectURL(b); a.download=sn; a.click();
+                if(ssv) dsv=true;
+                setBF();
+            }
+        } else {
+            if (fileHandle === null) {
+                try{
+                    var saveOptions = textFileOptions;
+                    saveOptions.suggestedName = sn;
+                    fileHandle = await window.showSaveFilePicker(saveOptions);
+                    setBF(await fileHandle.getFile());
+                } catch(e) {
+                    if (e.name !== 'AbortError') console.error(e);
+                    return;
+                }
+            }
+            const writable = await fileHandle.createWritable();
+            await writable.write(getSetElmValue());
+            await writable.close();
+            setBF();
+        }
+    }
+    async function fld() {
+        if (typeof(window.showOpenFilePicker) === 'undefined') {
+            var f=document.getElementById(idi);
+            if(f!==null){f.remove();}
+            f=document.createElement("input");
+            f.id=idi; f.type="file"; f.accept=".txt";
+            f.addEventListener("change",(e)=>{LoadFile(bf=e.target)});
+            document.head.appendChild(f); f.click();
+        } else {
+            try{
+                var openOptions = textFileOptions;
+                openOptions.directory = 'note/';
+                [fileHandle] = await window.showOpenFilePicker(openOptions);
+            } catch(e) {
+                if (e.name !== 'AbortError') console.error(e);
+                return;
+            }
+            LoadFile(setBF(await fileHandle.getFile()));
+        }
+    }
+    async function fcc(){
+        var ncd=cd^1;if(bf!==null&&confirm(cdl[ncd]+"として開き直しますか？"))LoadFile(bf,cd=ncd);
+    }
+    var replacePeriodBreak=(n)=>{
+        return n.replace(/([。]+|[.!?！？]\s+)(\n|)/g, function(m, p1, p2){return p1+(p2===''?"\n":p2);})
+        .replace(/^\s+/, " ");
+    };
+    var replaceDeleteBreak=(n)=>{
+        return n.replace(/(\n|)[\-\d]+\n/g, '').replace(/\n([^\n])/g, '$1');
+    };
+    var getFontSize=(e)=>{
+        return Number(getComputedStyle(e).fontSize.match(/\d+/)[0]);
+    }
+    function setTitleRewrite(){
+        if(!rewrite_flag){
+            rewrite_flag = true;
+            title_elm.innerText=title_left+'*'+(bf===null?'':title_sp+bf.name);
+        }
+
+    }
+    elm.addEventListener('paste',function(e){
+        setTitleRewrite();
+    })
+    document.body.onkeydown=(e)=>{
+        var modify_esc=e.ctrlKey||e.altKey||e.code.match(/^(F|Shift|Escape)/);
+        if(!e.shiftKey){
+            if(e.ctrlKey){
+                switch(e.code){
+                    case 'KeyS': case 'Enter':
+                        fsv();
+                        return false;
+                    break;
+                    case 'KeyO':
+                        fld();
+                        return false;
+                    break;
+                    case 'KeyZ': case 'KeyY':
+                        modify_esc = false;
+                    break;
+                }
+                if (e.altKey) {
+                    var keyNum = null;
+                    switch(e.code){
+                        case 'KeyB':
+                            if(confirm("句読点を自動的に改行しますか？")) {
+                                getSetElmValue(replacePeriodBreak(getSetElmValue()));
+                            }
+                            modify_esc = false;
+                        break;
+                        case 'KeyD':
+                            if(confirm("改行を削除しますか？")) {
+                                getSetElmValue(replaceDeleteBreak(getSetElmValue()));
+                            }
+                            modify_esc = false;
+                        break;
+                        case 'KeyL': case 'Comma':
+                            elm.style.textAlign='left';
+                            return false;
+                        break;
+                        case 'KeyR': case 'Period':
+                            elm.style.textAlign='right';
+                            return false;
+                        break;
+                        case 'KeyC': case 'Slash':
+                            elm.style.textAlign='center';
+                            return false;
+                        break;
+                        case 'KeyW': case 'KeyN':
+                            if(BeforeCloseEvent())setBF(null);
+                            return false;
+                        break;
+                        case 'KeyH': case 'KeyJ': case 'KeyK': case 'KeyM':
+                            switch(e.code){
+                                case 'KeyH': keyNum = 1; break;
+                                case 'KeyJ': keyNum = 2; break;
+                                case 'KeyK': keyNum = 3; break;
+                                case 'KeyM': keyNum = 0; break;
+                            }
+                            if(pdlrMode === keyNum || keyNum === 0){
+                                pdlrMode = 0;
+                                elm.style.paddingLeft = '';
+                                elm.style.paddingRight = '';
+                            } else {
+                                pdlrMode = keyNum;
+                                var mpc = pdlrMode + '0%';
+                                elm.style.paddingLeft = mpc;
+                                elm.style.paddingRight = mpc;
+                            }
+                        break;
+                        case 'Quote': case 'Digit0':
+                            elm.style.fontSize = '';
+                            return false;
+                        break;
+                        case 'Digit1': case 'Digit2': case 'Digit3': case 'Digit4':
+                        case 'Digit5': case 'Digit6': case 'Digit7': case 'Digit8':
+                            keyNum = Number(e.key);
+                            elm.style.fontSize = keyNum * 4 + 8;
+                        break;
+                        case 'Digit9': elm.style.fontSize = 48; break;
+                        case 'KeyP': elm.style.fontSize = 80; break;
+                        case 'Semicolon':
+                            elm.style.fontSize = getFontSize(elm) + 1;
+                            return false;
+                        break;
+                        case 'Minus':
+                            elm.style.fontSize = getFontSize(elm) - 1;
+                            return false;
+                        break;
+                        case 'BracketRight':
+                            elm.style.fontSize = getFontSize(elm) + 4;
+                            return false;
+                        break;
+                        case 'Backslash':
+                            elm.style.fontSize = getFontSize(elm) - 4;
+                            return false;
+                        break;
+                        case 'KeyI':
+                            fcc();
+                            return false;
+                        break;
+                    }
+                }
+                elm.focus();
+            }
+        }
+        if (!modify_esc) setTitleRewrite();
+        // console.log(e);
+    };
+    elm.focus();
+</script>
+</body>
+</html>
