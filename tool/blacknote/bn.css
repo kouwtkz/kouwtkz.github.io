@@ -19,8 +19,8 @@ body.menuVisible div.menu {
     display: block;
 }
 body.menuVisible div.main {
-    padding-top: 52px;
-    height: calc(100% - 52px);
+    padding-top: 48px;
+    height: calc(100% - 48px);
 }
 input[type="button"]:hover {
     background: #ffffff0f;
@@ -30,9 +30,9 @@ input[type="button"] {
     background: none;
     border: none;
     color: #ffffff88;
-    font-size: 32px;
+    font-size: 26px;
     padding: 0 8px;
-    height: 52px;
+    height: 48px;
 }
 .right {
     position: absolute;
