@@ -6,10 +6,10 @@ body {
 div.menu {
     display: none;
     position: fixed;
-    width: 100%;
     height: 48px;
     background-color: #1a1a1a;
     padding-left: 24px;
+    width: calc(100% - 24px);
 }
 div.main {
     transition: 0.1s;
