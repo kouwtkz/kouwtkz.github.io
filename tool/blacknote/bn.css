@@ -1,4 +1,6 @@
 textarea {
+    position: absolute;
+    display: inline-block;
     font-size: 28px;
     padding: 20px;
     margin: 0;
@@ -12,15 +14,16 @@ textarea {
     resize: none;
 }
 div.image {
+    position: absolute;
     display: none;
     width: 0;
     height: 0;
 }
 div.image input {
+    position: absolute;
     background: none;
     border: none;
     color: #ffffff88;
-    position: absolute;
     right: 0;
     font-size: 42px;
     padding: 0;
@@ -29,26 +32,23 @@ div.image input {
 
 }
 img {
+    position: absolute;
     width: fit-content;
     height: fit-content;
     max-width: 98%;
     max-height: 100%;
-    display: inline;
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
 }
 
 body.includeImage textarea {
-    display: inline-block;
     width: 48%;
     height: 100%;
 }
 
 body.includeImage div.image {
     display: inline-block;
-    position: absolute;
     width: 52%;
     height: 100%;
 }
@@ -57,6 +57,4 @@ body {
     margin: 0;
     background: black;
     color: white;
-    width: 100vw;
-    height: 100vh;
 }
