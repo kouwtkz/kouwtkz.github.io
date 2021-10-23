@@ -3,7 +3,7 @@ const title_sp = " | ";
 const title_elm = document.querySelector("title");
 var fileHandle = null;
 var idi = "fs",
-    bf = null,
+    FileObject = null,
     cd = 0,
     cdl = ["UTF-8", "Shift-JIS"];
 var elm = null,
@@ -13,14 +13,16 @@ var rewrite_flag = false;
 var ssv = location.protocol === "data:",
     dsv = false,
     nsv = "保存はページ表示ごとに1度だけです";
-var getSetElmValue = (v) => {
+var fileContain = false;
+var FSAA_check = "showOpenFilePicker" in window;
+var getSetElmValue = (v, rwChange = true) => {
     if (typeof v !== "undefined") {
         if (textareaMode) {
             elm.value = v;
         } else {
             elm.innerText = v;
         }
-        setTitleRewrite();
+        setTitleRewrite(rwChange);
     }
     if (textareaMode) {
         return elm.value;
@@ -52,38 +54,46 @@ function BeforeCloseEvent() {
 window.onbeforeunload = (e) => {
     if (rewrite_flag) return true;
 };
-function setBF(file) {
-    if (typeof file !== "undefined") bf = file;
+function setFileObject(file) {
     rewrite_flag = false;
-    if (bf === null) {
-        fileHandle = null;
-        delete document.body.dataset.filename;
-        title_elm.innerText = title_left;
-        getSetElmValue("");
+    if (file === null) {
+        FileObject = file;
+    } else if ("files" in file) {
+        FileObject = file.files[0];
     } else {
-        title_elm.innerText = title_left + title_sp + bf.name;
-        document.body.dataset.filename = bf.name;
-    }
-    return bf;
-}
-function LoadFile(t, _cd) {
-    var file;
-    if (t === null) {
-        return;
-    } else {
-        if (typeof t.files === "undefined") {
-            file = t;
+        if (typeof file === "object") {
+            FileObject = file;
         } else {
-            file = t.files[0];
+            FileObject = { str: file };
         }
     }
-    if (typeof _cd !== "number") _cd = cd;
-    var rd = new FileReader(),
-        ec = cdl[_cd];
-    rd.readAsText(file, ec);
-    rd.onload = (e) => {
-        getSetElmValue(rd.result);
-    };
+    if (FileObject === null) {
+        fileHandle = null;
+        delete document.body.dataset.filename;
+        getSetElmValue("");
+        fileContain = false;
+    } else {
+        document.body.dataset.filename = FileObject.name;
+        fileContain = true;
+    }
+    return FileObject;
+}
+function LoadFile(file, _cd) {
+    var file;
+    if (file === null) {
+        return;
+    } else if ("str" in file) {
+        getSetElmValue(file.str, false);
+    } else {
+        if (typeof _cd !== "number") _cd = cd;
+        var rd = new FileReader(),
+            ec = cdl[_cd];
+        rd.readAsText(file, ec);
+        rd.onload = (e) => {
+            fileContain = true;
+            getSetElmValue(rd.result, false);
+        };
+    }
 }
 function getLogDateName() {
     const d = new Date();
@@ -98,37 +108,19 @@ function getLogDateName() {
         ".txt"
     );
 }
-async function fsv() {
+async function saveTextarea() {
     var sn = "",
-        sndfn = document.body.dataset.filename;
-    if (typeof sndfn !== "undefined") sn = sndfn;
+        sndfn = document.body.dataset.filename,
+        u_sndfn = typeof sndfn === "undefined";
+    if (!u_sndfn) sn = sndfn;
     if (sn === "") sn = getLogDateName();
-    if (typeof window.showOpenFilePicker === "undefined") {
-        if (dsv) {
-            alert(nsv);
-        } else if (
-            confirm(
-                "テキストの内容を保存しますか？\n保存名>> " +
-                    sn +
-                    (ssv ? "\n(" + nsv + ")" : "")
-            )
-        ) {
-            var text = getSetElmValue();
-            var b = new Blob([text], { type: "text/plane" });
-            var a = document.createElement("a");
-            a.href = URL.createObjectURL(b);
-            a.download = sn;
-            a.click();
-            if (ssv) dsv = true;
-            setBF();
-        }
-    } else {
+    if (FSAA_check) {
         if (fileHandle === null) {
             try {
                 var saveOptions = textFileOptions;
                 saveOptions.suggestedName = sn;
                 fileHandle = await window.showSaveFilePicker(saveOptions);
-                setBF(await fileHandle.getFile());
+                setFileObject(await fileHandle.getFile());
             } catch (e) {
                 if (e.name !== "AbortError") console.error(e);
                 return;
@@ -137,11 +129,49 @@ async function fsv() {
         const writable = await fileHandle.createWritable();
         await writable.write(getSetElmValue());
         await writable.close();
-        setBF();
+        rewrite_flag = false;
+        setTitleRewrite(false);
+    } else {
+        if (dsv) {
+            alert(nsv);
+        } else {
+            if (
+                confirm(
+                    "テキストの内容を保存しますか？\n保存名>> " +
+                        sn +
+                        (ssv ? "\n(" + nsv + ")" : "")
+                )
+            ) {
+                if (u_sndfn) {
+                    document.body.dataset.filename = sn;
+                    fileContain = true;
+                }
+                var text = getSetElmValue();
+                var b = new Blob([text], { type: "text/plane" });
+                var a = document.createElement("a");
+                a.href = URL.createObjectURL(b);
+                a.download = sn;
+                a.click();
+                if (ssv) dsv = true;
+                rewrite_flag = false;
+                setTitleRewrite(false);
+            }
+        }
     }
+    elm.focus();
 }
-async function fld() {
-    if (typeof window.showOpenFilePicker === "undefined") {
+async function loadTextarea() {
+    if (FSAA_check) {
+        try {
+            var openOptions = textFileOptions;
+            openOptions.directory = "note/";
+            [fileHandle] = await window.showOpenFilePicker(openOptions);
+        } catch (e) {
+            if (e.name !== "AbortError") console.error(e);
+            return;
+        }
+        LoadFile(setFileObject(await fileHandle.getFile()));
+    } else {
         var f = document.getElementById(idi);
         if (f !== null) {
             f.remove();
@@ -151,26 +181,19 @@ async function fld() {
         f.type = "file";
         f.accept = ".txt";
         f.addEventListener("change", (e) => {
-            LoadFile((bf = e.target));
+            LoadFile(setFileObject(e.target));
         });
         document.head.appendChild(f);
         f.click();
-    } else {
-        try {
-            var openOptions = textFileOptions;
-            openOptions.directory = "note/";
-            [fileHandle] = await window.showOpenFilePicker(openOptions);
-        } catch (e) {
-            if (e.name !== "AbortError") console.error(e);
-            return;
-        }
-        LoadFile(setBF(await fileHandle.getFile()));
     }
+    elm.focus();
 }
-async function fcc() {
+
+async function reloadTextarea() {
     var ncd = cd ^ 1;
-    if (bf !== null && confirm(cdl[ncd] + "として開き直しますか？"))
-        LoadFile(bf, (cd = ncd));
+    if (FileObject !== null && confirm(cdl[ncd] + "として開き直しますか？"))
+        LoadFile(FileObject, (cd = ncd));
+    elm.focus();
 }
 var replacePeriodBreak = (n) => {
     return n
@@ -185,17 +208,43 @@ var replaceDeleteBreak = (n) => {
 var getFontSize = (e) => {
     return Number(getComputedStyle(e).fontSize.match(/\d+/)[0]);
 };
+function imgDelete() {
+    var img = document.querySelector("img");
+    delete img.src;
+    document.body.classList.remove("includeImage");
+    elm.focus();
+}
+function closeTextarea() {
+    if (BeforeCloseEvent()) {
+        fileContain = false;
+        setFileObject(null);
+    }
+    elm.focus();
+}
+function newWindowOpen() {
+    open(location.href);
+}
 function titleUpdate(ast = true) {
     title_elm.innerText =
-        title_left + (ast ? "*" : "") + (bf === null ? "" : title_sp + bf.name);
+        title_left +
+        (ast ? "*" : "") +
+        (typeof document.body.dataset.filename === "undefined"
+            ? ""
+            : title_sp + document.body.dataset.filename);
 }
-function setTitleRewrite() {
+function setTitleRewrite(rewrite_change = true) {
     if (rewrite_flag) {
-        if (bf === null && elm.value === "") {
-            titleUpdate((rewrite_flag = false));
+        if (!fileContain && elm.value === "") {
+            if (rewrite_change) {
+                rewrite_flag = false;
+            }
+            titleUpdate(rewrite_flag);
         }
     } else {
-        titleUpdate((rewrite_flag = bf !== null || elm.value !== ""));
+        if (rewrite_change) {
+            rewrite_flag = fileContain || elm.value !== "";
+        }
+        titleUpdate(rewrite_flag);
     }
 }
 function insertTextarea(
@@ -303,13 +352,7 @@ elm.addEventListener("paste", (e) => {
     }
     return rt;
 });
-function imgDelete(){
-    var img = document.querySelector("img");
-    delete img.src;
-    document.body.classList.remove("includeImage");
-    elm.focus();
-}
-document.body.onkeydown = (e) => {
+elm.onkeydown = (e) => {
     if (e.code === "Tab" && !(e.ctrlKey || e.altKey)) {
         return !insertTextarea("\t", e.shiftKey);
     }
@@ -318,10 +361,10 @@ document.body.onkeydown = (e) => {
             switch (e.code) {
                 case "KeyS":
                 case "Enter":
-                    fsv();
+                    saveTextarea();
                     return false;
                 case "KeyO":
-                    fld();
+                    loadTextarea();
                     return false;
             }
             if (e.altKey) {
@@ -354,8 +397,10 @@ document.body.onkeydown = (e) => {
                         elm.style.textAlign = "center";
                         return false;
                     case "KeyW":
+                        closeTextarea();
+                        return false;
                     case "KeyN":
-                        if (BeforeCloseEvent()) setBF(null);
+                        newWindowOpen();
                         return false;
                     case "KeyH":
                     case "KeyJ":
@@ -420,7 +465,10 @@ document.body.onkeydown = (e) => {
                         elm.style.fontSize = getFontSize(elm) - 4;
                         return false;
                     case "KeyI":
-                        fcc();
+                        reloadTextarea();
+                        return false;
+                    case "KeyB":
+                        document.body.classList.toggle("menuVisible");
                         return false;
                 }
             }
@@ -429,6 +477,6 @@ document.body.onkeydown = (e) => {
     }
     // console.log(e);
 };
-if ("serviceWorker" in navigator && location.protocol !== "file:") {
+if ("serviceWorker" in navigator && location.protocol === "https:") {
     navigator.serviceWorker.register("bnsw.js");
 }
