@@ -1,4 +1,4 @@
-<html manifest="bn.manifest">
+<html>
 <style>
 textarea{
     font-size:28px;
@@ -341,6 +341,9 @@ body{
         // console.log(e);
     };
     elm.focus();
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('bnsw.js');
+    }
 </script>
 </body>
 </html>
