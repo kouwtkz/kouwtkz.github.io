@@ -5,7 +5,8 @@ var fileHandle = null;
 var idi = "fs",
     FileObject = null,
     cd = 0,
-    cdl = ["UTF-8", "Shift-JIS"];
+    cdl = ["UTF-8", "Shift-JIS"],
+    cdl_s = ["UTF8", "SJIS"];
 var elm = null,
     textareaMode = false;
 var pdlrMode = 0;
@@ -78,16 +79,15 @@ function setFileObject(file) {
     }
     return FileObject;
 }
-function LoadFile(file, _cd) {
+function LoadFile(file) {
     var file;
     if (file === null) {
         return;
     } else if ("str" in file) {
         getSetElmValue(file.str, false);
     } else {
-        if (typeof _cd !== "number") _cd = cd;
         var rd = new FileReader(),
-            ec = cdl[_cd];
+            ec = cdl[cd];
         rd.readAsText(file, ec);
         rd.onload = (e) => {
             fileContain = true;
@@ -129,6 +129,10 @@ async function saveTextarea() {
         const writable = await fileHandle.createWritable();
         await writable.write(getSetElmValue());
         await writable.close();
+        if (cd !== 0) {
+            cd = 0;
+            cdButtonUpdate();
+        }
         rewrite_flag = false;
         setTitleRewrite(false);
     } else {
@@ -188,11 +192,19 @@ async function loadTextarea() {
     }
     elm.focus();
 }
-
+function cdButtonUpdate() {
+    var cdelm = document.getElementById("cdButton");
+    if (cdelm !== null) {
+        cdelm.value = cdl_s[cd];
+    }
+}
 async function reloadTextarea() {
     var ncd = cd ^ 1;
-    if (FileObject !== null && confirm(cdl[ncd] + "として開き直しますか？"))
-        LoadFile(FileObject, (cd = ncd));
+    if (FileObject !== null && confirm(cdl[ncd] + "として開き直しますか？")) {
+        cd = ncd;
+        cdButtonUpdate();
+        LoadFile(FileObject);
+    }
     elm.focus();
 }
 var replacePeriodBreak = (n) => {
@@ -217,6 +229,8 @@ function imgDelete() {
 function closeTextarea() {
     if (BeforeCloseEvent()) {
         fileContain = false;
+        cd = 0;
+        cdButtonUpdate();
         setFileObject(null);
     }
     elm.focus();
@@ -326,6 +340,7 @@ function insertTextarea(
     }
     return false;
 }
+cdButtonUpdate();
 elm = document.querySelector("textarea");
 textareaMode = elm.tagName === "TEXTAREA";
 elm.focus();

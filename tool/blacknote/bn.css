@@ -34,6 +34,9 @@ input[type="button"] {
     padding: 0 8px;
     height: 48px;
 }
+input[type="button"][value=""] {
+    display: none;
+}
 .right {
     position: absolute;
     right: 0;
