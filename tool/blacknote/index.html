@@ -161,18 +161,86 @@ body{
     var getFontSize=(e)=>{
         return Number(getComputedStyle(e).fontSize.match(/\d+/)[0]);
     }
-    function setTitleRewrite(){
-        if(!rewrite_flag){
-            rewrite_flag = true;
-            title_elm.innerText=title_left+'*'+(bf===null?'':title_sp+bf.name);
-        }
-
+    function titleUpdate(ast=true){
+        title_elm.innerText=title_left+(ast?'*':'')+(bf===null?'':title_sp+bf.name);
     }
-    elm.addEventListener('paste',function(e){
+    function setTitleRewrite(){
+        if(rewrite_flag){
+            if(bf===null&&elm.value===''){
+                titleUpdate(rewrite_flag=false);
+            }
+        }else{
+            titleUpdate(rewrite_flag=(bf!==null||elm.value!==''));
+        }
+    }
+    function insertTextarea(str='',shiftMode=false,multype=0,textarea=null){
+        if(textarea===null)textarea=elm;
+        if(str!==''){
+            const ss=textarea.selectionStart,se=textarea.selectionEnd;
+            const sr=se-ss,v=textarea.value,sl=str.length;
+            var ts=v.slice(0,ss),tr=v.slice(ss,se),te=v.slice(se);
+            var as=ss,ae=se,ad='';
+            if(isNaN(multype)){
+                ad=String(multype);
+            }
+            if(ad!==''){
+                var al=ad.length;
+                if(shiftMode){
+                    if(ts.slice(-sl)===str&&te.slice(0,al)===ad){
+                        textarea.value=ts.slice(0,ss-sl)+tr+te.slice(al);
+                        as=ss-sl;ae=se-sl;
+                    }
+                }else{
+                    textarea.value=ts+str+tr+ad+te;
+                    as=ss+sl;ae=se+sl;
+                }
+            }else{
+                if(sr===0||multype){
+                    if(shiftMode){
+                        if(ts.slice(-sl)===str){
+                            textarea.value=ts.slice(0,ss-sl)+tr+te;
+                            as=ss-sl;ae=se-sl;
+                        }
+                    }else{
+                        textarea.value=ts+str+tr+te;
+                        as=ss+sl;ae=se+sl;
+                    }
+                }else{
+                    var tsn=ts.match(/[^\n]*$/)[0],ten=te.match(/^[^\n]*/)[0];
+                    var loopNum=0;
+                    ts=ts.slice(0,ss-tsn.length);
+                    te=te.slice(ten.length);
+                    tr=tsn+tr+ten;
+                    tr=tr.replace(/(^|\n)([^\n]*)/g,function(m0,m1,m2){
+                        if(shiftMode){
+                            if(m2.slice(0,sl)===str){
+                                loopNum--;
+                                m2=m2.slice(sl);
+                            }
+                            return m1+m2;
+                        }else{
+                            loopNum++;
+                            return m1+str+m2;
+                        }
+                    });
+                    textarea.value=ts+tr+te;
+                    as=ss+sl*Math.sign(loopNum);ae=se+sl*loopNum;
+                }
+            }
+            textarea.selectionStart=as;
+            textarea.selectionEnd=ae;
+            setTitleRewrite();
+            return true;
+        }
+        return false;
+    }
+    elm.addEventListener('input',function(e){
         setTitleRewrite();
-    })
+    });
     document.body.onkeydown=(e)=>{
-        var modify_esc=e.ctrlKey||e.altKey||e.code.match(/^(F|Shift|Escape)/);
+        if (e.code==='Tab'&&!(e.ctrlKey||e.altKey)){
+            return !insertTextarea("\t",e.shiftKey);
+        }
         if(!e.shiftKey){
             if(e.ctrlKey){
                 switch(e.code){
@@ -184,9 +252,6 @@ body{
                         fld();
                         return false;
                     break;
-                    case 'KeyZ': case 'KeyY':
-                        modify_esc = false;
-                    break;
                 }
                 if (e.altKey) {
                     var keyNum = null;
@@ -195,13 +260,13 @@ body{
                             if(confirm("句読点を自動的に改行しますか？")) {
                                 getSetElmValue(replacePeriodBreak(getSetElmValue()));
                             }
-                            modify_esc = false;
+                            return false;
                         break;
                         case 'KeyD':
                             if(confirm("改行を削除しますか？")) {
                                 getSetElmValue(replaceDeleteBreak(getSetElmValue()));
                             }
-                            modify_esc = false;
+                            return false;
                         break;
                         case 'KeyL': case 'Comma':
                             elm.style.textAlign='left';
@@ -273,7 +338,6 @@ body{
                 elm.focus();
             }
         }
-        if (!modify_esc) setTitleRewrite();
         // console.log(e);
     };
     elm.focus();
