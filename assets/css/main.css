@@ -1,0 +1,14 @@
+body {
+    background-color: wheat;
+}
+div.main {
+    margin: 20px 100px;
+    text-align: center;
+}
+div.main > * {
+    display: inline-block;
+}
+div.mylink > * {
+    display: flex;
+    justify-content: space-evenly;
+}
