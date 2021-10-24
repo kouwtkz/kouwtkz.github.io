@@ -6,9 +6,20 @@ div.main {
     text-align: center;
 }
 div.main > * {
-    display: inline-block;
+    display: block;
 }
-div.mylink > * {
+div.mylink {
     display: flex;
     justify-content: space-evenly;
+}
+div.mylink a {
+    text-decoration: none;
+    background-color: #90a574;
+    color: #f9fbf4;
+    border-radius: 10px;
+    margin: 4px;
+    padding: 8px 16px;
+}
+h1 {
+    font-size: 26px;
 }

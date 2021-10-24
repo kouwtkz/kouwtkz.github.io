@@ -1,0 +1,26 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "jekyll:Build",
+            "type": "shell",
+            "command": "jekyll build",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "chrome:Open",
+            "type": "shell",
+            "command": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+            "args": [
+                "http://localhost:5500/${relativeFile}"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

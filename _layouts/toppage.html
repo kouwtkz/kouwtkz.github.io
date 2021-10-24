@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  {% include main_head.html %}
+  <link rel="stylesheet" href="/assets/css/toppage.css" type="text/css">
+  <title>{{ page.title }} | {{ site.name }}</title>
+
+</head>
+
+<body>
+  <div class="main">
+    <p>{% include mylink.html %}</p>
+    <section>
+      {{ content }}
+    </section>
+    <p><a href="{{ site.url }}"><img src="{{ site.logo }}"></a></p>
+  </div>
+</body>
+
+</html>

@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta http-equiv="content-type" charset="utf-8">
-  <meta name='viewport' content='width=device-width,initial-scale=1' />
-  <meta property="og:title" content="{{ page.title }} | {{ site.name }}" />
+  {% include main_head.html %}
   <title>{{ page.title }} | {{ site.name }}</title>
-  <link rel="stylesheet" href="/assets/css/reset.css" type="text/css">
-  <link rel="stylesheet" href="/assets/css/main.css" type="text/css">
-  <link rel="icon" sizes="16x16 32x32 48x48 64x64" href="/favicon.ico" />
-  <style>
-  </style>
+
 </head>
+
 <body>
   <div class="main">
     <p>{% include mylink.html %}</p>
@@ -19,7 +15,5 @@
     </section>
   </div>
 </body>
-{% if script %}
-{{ script }}
-{% endif %}
+
 </html>

@@ -1,0 +1,8 @@
+h1 {
+    margin: 30px auto;
+}
+div.main > p img {
+    margin-top: 40px;
+    width: 40vw;
+    min-width: fit-content;
+}

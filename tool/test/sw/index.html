@@ -2,13 +2,15 @@
 layout: default
 title: Home
 ---
-<div class="main">
-    <div id="output"></div>
-</div>    
-{% capture script %}
+<pre id="output" style="text-align: left;"></pre>
 <script>
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("sw.js");
+        navigator.serviceWorker.addEventListener('message', e => {
+            document.getElementById("output").innerHTML += JSON.stringify(e.data, null, "\t");
+        });
+        if (navigator.serviceWorker.controller !== null) {
+            navigator.serviceWorker.controller.postMessage('');
+        }
     }
 </script>
-{% endcapture %}
