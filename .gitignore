@@ -1,2 +1,3 @@
 # Jekyll ignore list
 _site/
+.jekyll-cache/
