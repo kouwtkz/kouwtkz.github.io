@@ -115,20 +115,28 @@ async function saveTextarea() {
     if (!u_sndfn) sn = sndfn;
     if (sn === "") sn = getLogDateName();
     if (FSAA_check) {
-        if (fileHandle === null) {
-            try {
+        try {
+            if (fileHandle === null) {
                 var saveOptions = textFileOptions;
                 saveOptions.suggestedName = sn;
                 fileHandle = await window.showSaveFilePicker(saveOptions);
                 setFileObject(await fileHandle.getFile());
-            } catch (e) {
-                if (e.name !== "AbortError") console.error(e);
-                return;
             }
+            const writable = await fileHandle.createWritable();
+            await writable.write(getSetElmValue());
+            await writable.close();
+        } catch (e) {
+            switch (e.name) {
+                case "NotAllowedError":
+                case "AbortError":
+                    break;
+                default:
+                    console.error(e);
+                    break;
+            }
+            elm.focus();
+            return;
         }
-        const writable = await fileHandle.createWritable();
-        await writable.write(getSetElmValue());
-        await writable.close();
         if (cd !== 0) {
             cd = 0;
             cdButtonUpdate();
@@ -173,6 +181,7 @@ async function loadTextarea() {
                 [fileHandle] = await window.showOpenFilePicker(openOptions);
             } catch (e) {
                 if (e.name !== "AbortError") console.error(e);
+                elm.focus();
                 return;
             }
             LoadFile(setFileObject(await fileHandle.getFile()));
