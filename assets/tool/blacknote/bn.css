@@ -50,11 +50,25 @@ textarea {
     border: none;
     width: 99.9%;
     height: 100%;
-    text-align: center;
+    text-align: left;
     font-family: sans-serif;
     background: black;
     color: white;
     resize: none;
+}
+@media (min-aspect-ratio: 1 / 1) {
+    @media screen and (min-width: 700px) {
+        textarea {
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+    }
+    @media screen and (min-width: 1200px) {
+        textarea {
+            padding-left: 20%;
+            padding-right: 20%;
+        }
+    }
 }
 textarea:focus {
     outline: none;

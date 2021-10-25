@@ -417,11 +417,15 @@ elm.onkeydown = (e) => {
                     case "KeyN":
                         newWindowOpen();
                         return false;
+                    case "KeyG":
                     case "KeyH":
                     case "KeyJ":
                     case "KeyK":
                     case "KeyM":
                         switch (e.code) {
+                            case "KeyG":
+                                keyNum = -1;
+                                break;
                             case "KeyH":
                                 keyNum = 1;
                                 break;
@@ -441,7 +445,11 @@ elm.onkeydown = (e) => {
                             elm.style.paddingRight = "";
                         } else {
                             pdlrMode = keyNum;
-                            var mpc = pdlrMode + "0%";
+                            if (pdlrMode < 0) {
+                                var mpc = 0;
+                            } else {
+                                var mpc = pdlrMode + "0%";
+                            }
                             elm.style.paddingLeft = mpc;
                             elm.style.paddingRight = mpc;
                         }
@@ -493,5 +501,5 @@ elm.onkeydown = (e) => {
     // console.log(e);
 };
 if ("serviceWorker" in navigator && location.protocol === "https:") {
-    navigator.serviceWorker.register("bnsw.js");
+    navigator.serviceWorker.register("/assets/tool/blacknote/bnsw.js");
 }
