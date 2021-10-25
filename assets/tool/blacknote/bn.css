@@ -31,7 +31,7 @@ div.menu input[type="button"] {
     height: 100%;
     margin: 0;
     width: 92px;
-    max-width: 18%;
+    max-width: 20%;
 }
 div.menu input.close[type="button"] {
     width: 52px;
