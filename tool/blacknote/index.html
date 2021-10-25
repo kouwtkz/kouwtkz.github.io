@@ -10,7 +10,10 @@
         <input type="button" value="OPEN" onclick="loadTextarea()">
         <input type="button" value="SAVE" onclick="saveTextarea()">
         <input type="button" id="cdButton" value="" onclick="reloadTextarea()">
-        <input type="button" class="right close" value="×" onclick="closeTextarea()">
+        <div class="right">
+            <input type="button" class="switchDisabled" value="E" onclick="switchTextareaDisabled()">
+            <input type="button" class="close" value="×" onclick="closeTextarea()">
+        </div>
     </div>
     <div class="main">
         <textarea></textarea>

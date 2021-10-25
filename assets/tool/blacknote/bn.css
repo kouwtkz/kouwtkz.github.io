@@ -6,7 +6,7 @@ body {
 div.menu {
     display: none;
     position: fixed;
-    height: 48px;
+    height: 40px;
     background-color: #1a1a1a;
     padding-left: 24px;
     width: calc(100% - 24px);
@@ -20,8 +20,30 @@ body.menuVisible div.menu {
     display: block;
 }
 body.menuVisible div.main {
-    padding-top: 48px;
-    height: calc(100% - 48px);
+    padding-top: 40px;
+    height: calc(100% - 40px);
+}
+div.menu div.right > * {
+    float: left;
+}
+div.menu input[type="button"] {
+    font-size: 20px;
+    height: 100%;
+    margin: 0;
+    width: 92px;
+    max-width: 18%;
+}
+div.menu input.close[type="button"] {
+    width: 52px;
+    max-width: 52px;
+    font-size: 38px;
+    line-height: 80%;
+    height: 100%;
+}
+div.menu input.switchDisabled[type="button"] {
+    width: 52px;
+    max-width: 52px;
+    font-size: 24px;
 }
 input[type="button"]:hover {
     background: #ffffff0f;
@@ -39,8 +61,7 @@ input[type="button"][value=""] {
     display: none;
 }
 .right {
-    position: absolute;
-    right: 0;
+    float: right;
 }
 textarea {
     display: inline-block;

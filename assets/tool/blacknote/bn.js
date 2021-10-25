@@ -218,6 +218,20 @@ async function reloadTextarea() {
     }
     elm.focus();
 }
+function confirmReplacePeriodBreak(){
+    if (confirm("句読点を自動的に改行しますか？")) {
+        getSetElmValue(
+            replacePeriodBreak(getSetElmValue())
+        );
+    }
+}
+function confirmDeleteBreak(){
+    if (confirm("改行を削除しますか？")) {
+        getSetElmValue(
+            replaceDeleteBreak(getSetElmValue())
+        );
+    }
+}
 var replacePeriodBreak = (n) => {
     return n
         .replace(/([。]+|[.!?！？]\s+)(\n|)/g, function (m, p1, p2) {
@@ -271,6 +285,14 @@ function setTitleRewrite(rewrite_change = true) {
         }
         titleUpdate(rewrite_flag);
     }
+}
+const disableTextareaStr = ["E", "L"];
+function switchTextareaDisabled() {
+    elm.disabled = !elm.disabled;
+    document.querySelectorAll("input.switchDisabled").forEach(e=>{
+        e.value = disableTextareaStr[Number(elm.disabled)];
+    })
+    elm.focus();
 }
 function insertTextarea(
     str = "",
@@ -378,15 +400,19 @@ elm.addEventListener("paste", (e) => {
     }
     return rt;
 });
-elm.onkeydown = (e) => {
+document.body.onkeydown = (e) => {
     if (e.code === "Tab" && !(e.ctrlKey || e.altKey)) {
         return !insertTextarea("\t", e.shiftKey);
     }
     if (!e.shiftKey) {
         if (e.ctrlKey) {
             switch (e.code) {
-                case "KeyS":
                 case "Enter":
+                    if (e.altKey) {
+                        confirmReplacePeriodBreak();
+                        return false;                        
+                    }
+                case "KeyS":
                     saveTextarea();
                     return false;
                 case "KeyO":
@@ -396,19 +422,8 @@ elm.onkeydown = (e) => {
             if (e.altKey) {
                 var keyNum = null;
                 switch (e.code) {
-                    case "KeyE":
-                        if (confirm("句読点を自動的に改行しますか？")) {
-                            getSetElmValue(
-                                replacePeriodBreak(getSetElmValue())
-                            );
-                        }
-                        return false;
                     case "KeyD":
-                        if (confirm("改行を削除しますか？")) {
-                            getSetElmValue(
-                                replaceDeleteBreak(getSetElmValue())
-                            );
-                        }
+                        switchTextareaDisabled();
                         return false;
                     case "KeyL":
                     case "Comma":
@@ -503,6 +518,9 @@ elm.onkeydown = (e) => {
                         return false;
                     case "KeyB":
                         document.body.classList.toggle("menuVisible");
+                        return false;
+                    case "Backspace":
+                        confirmDeleteBreak();
                         return false;
                 }
             }
