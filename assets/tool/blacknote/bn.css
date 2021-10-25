@@ -8,8 +8,10 @@ div.menu {
     position: fixed;
     height: 40px;
     background-color: #1a1a1a;
-    padding-left: 24px;
-    width: calc(100% - 24px);
+    width: 100%;
+}
+div.menu > *:first-child{
+    margin-left: 12px!important;
 }
 div.main {
     transition: 0.1s;
@@ -23,6 +25,13 @@ body.menuVisible div.main {
     padding-top: 40px;
     height: calc(100% - 40px);
 }
+div.menu > * {
+    display: block;
+    float: left;
+}
+div.menu div.right {
+    float: right;
+}
 div.menu div.right > * {
     float: left;
 }
@@ -31,7 +40,7 @@ div.menu input[type="button"] {
     height: 100%;
     margin: 0;
     width: 92px;
-    max-width: 20%;
+    max-width: 18%;
 }
 div.menu input.close[type="button"] {
     width: 52px;
@@ -54,7 +63,6 @@ input[type="button"] {
     border: none;
     color: #ffffff88;
     font-size: 24px;
-    padding: 0px 12px;
     height: 48px;
 }
 input[type="button"][value=""] {
@@ -83,11 +91,17 @@ textarea {
             padding-left: 10%;
             padding-right: 10%;
         }
+        div.menu > *:first-child{
+            margin-left: 24px!important;
+        }
     }
     @media screen and (min-width: 1200px) {
         textarea {
             padding-left: 20%;
             padding-right: 20%;
+        }
+        div.menu > *:first-child{
+            margin-left: 36px!important;
         }
     }
 }
