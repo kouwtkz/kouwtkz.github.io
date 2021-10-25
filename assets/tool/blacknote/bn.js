@@ -165,30 +165,32 @@ async function saveTextarea() {
     elm.focus();
 }
 async function loadTextarea() {
-    if (FSAA_check) {
-        try {
-            var openOptions = textFileOptions;
-            openOptions.directory = "note/";
-            [fileHandle] = await window.showOpenFilePicker(openOptions);
-        } catch (e) {
-            if (e.name !== "AbortError") console.error(e);
-            return;
+    if (BeforeCloseEvent()) {
+        if (FSAA_check) {
+            try {
+                var openOptions = textFileOptions;
+                openOptions.directory = "note/";
+                [fileHandle] = await window.showOpenFilePicker(openOptions);
+            } catch (e) {
+                if (e.name !== "AbortError") console.error(e);
+                return;
+            }
+            LoadFile(setFileObject(await fileHandle.getFile()));
+        } else {
+            var f = document.getElementById(idi);
+            if (f !== null) {
+                f.remove();
+            }
+            f = document.createElement("input");
+            f.id = idi;
+            f.type = "file";
+            f.accept = ".txt";
+            f.addEventListener("change", (e) => {
+                LoadFile(setFileObject(e.target));
+            });
+            document.head.appendChild(f);
+            f.click();
         }
-        LoadFile(setFileObject(await fileHandle.getFile()));
-    } else {
-        var f = document.getElementById(idi);
-        if (f !== null) {
-            f.remove();
-        }
-        f = document.createElement("input");
-        f.id = idi;
-        f.type = "file";
-        f.accept = ".txt";
-        f.addEventListener("change", (e) => {
-            LoadFile(setFileObject(e.target));
-        });
-        document.head.appendChild(f);
-        f.click();
     }
     elm.focus();
 }
