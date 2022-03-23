@@ -8,3 +8,6 @@ div.main > p img {
     max-height: 512px;
     height: 30vh;
 }
+.top_logo {
+    height: 70px;
+}
