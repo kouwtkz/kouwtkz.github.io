@@ -3,7 +3,7 @@
 
 <head>
   {% include main_head.html %}
-  <link rel="stylesheet" href="/assets/css/toppage.css" type="text/css">
+  <link rel="stylesheet" href="/src/css/toppage.css" type="text/css">
   <title>{{ page.title }} | {{ site.name }}</title>
 
 </head>
@@ -12,6 +12,9 @@
   <div class="main">
     <p><a href="{{ site.url }}"><img class="top_logo" src="{{ site.logo }}"></a></p>
     <p>{% include mylink.html %}</p>
+    <div class="otherlink">
+      <a href="tool">ツールページを見る</a>
+    </div>
     <section>
       {{ content }}
     </section>

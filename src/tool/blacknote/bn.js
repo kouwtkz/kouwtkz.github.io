@@ -530,5 +530,5 @@ document.body.onkeydown = (e) => {
     // console.log(e);
 };
 if ("serviceWorker" in navigator && location.protocol === "https:") {
-    navigator.serviceWorker.register("/assets/tool/blacknote/bnsw.js");
+    navigator.serviceWorker.register("/src/tool/blacknote/bnsw.js");
 }

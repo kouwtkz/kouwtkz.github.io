@@ -4,8 +4,8 @@ const CACHE_NAME = `${registration.scope}!${CACHE_VERSION}`;
 // キャッシュするファイルをセットする
 const urlsToCache = [
   '.',
-  '/assets/tool/blacknote/bn.css',
-  '/assets/tool/blacknote/bn.js'
+  '/src/tool/blacknote/bn.css',
+  '/src/tool/blacknote/bn.js'
 ];
 
 // https://laboradian.com/create-offline-site-using-sw/ を使わせていただいてます
