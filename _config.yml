@@ -1,6 +1,16 @@
 plugins:
- - jekyll-sitemap
+    - jekyll-sitemap
 name: わたかぜ屋
 url: https://kouwtkz.github.io
 logo: /src/img/typography/wtkz_logo.png
 como_pixel: /src/img/character/como/como_icon_192.png
+defaults:
+    - scope:
+          path: "src/img"
+      values:
+          image: true
+    - scope:
+          path: "gallery_img/"
+      values:
+          image: true
+          gallery: true
