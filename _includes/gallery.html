@@ -1,4 +1,4 @@
-<div class="gallery">{% assign image_files = site.static_files | where: "image", true | where: "gallery", true %}
+<div class="gallery">{% assign image_files = site.static_files | where: "gallery", true %}
     <ul>
         {% for myimage in image_files %}
         {% assign file_def = site.data.gallery[myimage.name]
@@ -11,7 +11,7 @@
                 </a>
                 <p>{{ title }}</p>
                 <pre>{{ detail }}</pre>
-            </div>{% endfor %}
-        </li>
+            </div>
+        </li>{% endfor %}
     </ul>
 </div>

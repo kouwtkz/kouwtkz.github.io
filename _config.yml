@@ -10,7 +10,6 @@ defaults:
       values:
           image: true
     - scope:
-          path: "gallery_img/"
+          path: "gallery_img"
       values:
-          image: true
           gallery: true
