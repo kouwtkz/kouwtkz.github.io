@@ -1,6 +1,12 @@
 body {
     background-color: wheat;
 }
+h1 {
+    margin: 30px auto;
+}
+.top_logo {
+    height: 70px;
+}
 div.main {
     margin: 20px 0;
     text-align: center;
@@ -15,16 +21,16 @@ div.mylink {
     margin: 50px auto;
 }
 .otherlink {
-    margin: 80px auto;
-}
+    margin: 72px auto;
+text-align: left;width: auto;max-width: 400px;}
 .otherlink a {
     background-color: #90a574;
     color: #f9fbf4;
-    border-radius: 10px;
+    border-radius: 0px 10px 10px 0px;
     margin: 4px;
-    padding: 8px 16px;
-    font-size: 20px;
-}
+    padding: 10px 30px;
+    font-size: 24px;
+border-left: solid 10px #79905c;}
 div a {
     text-decoration: none;
 }
