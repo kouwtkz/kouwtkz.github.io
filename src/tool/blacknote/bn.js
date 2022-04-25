@@ -398,7 +398,7 @@ elm.addEventListener("paste", (e) => {
 });
 document.body.ondrop = (e) => {
     if (e.dataTransfer.files.length > 0) {
-        LoadFile(e.dataTransfer.files[0]);
+        LoadFile(setFileObject(e.dataTransfer));
         return false;
     }
 };
