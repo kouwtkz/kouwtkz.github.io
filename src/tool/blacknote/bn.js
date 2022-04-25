@@ -218,18 +218,14 @@ async function reloadTextarea() {
     }
     elm.focus();
 }
-function confirmReplacePeriodBreak(){
+function confirmReplacePeriodBreak() {
     if (confirm("句読点を自動的に改行しますか？")) {
-        getSetElmValue(
-            replacePeriodBreak(getSetElmValue())
-        );
+        getSetElmValue(replacePeriodBreak(getSetElmValue()));
     }
 }
-function confirmDeleteBreak(){
+function confirmDeleteBreak() {
     if (confirm("改行を削除しますか？")) {
-        getSetElmValue(
-            replaceDeleteBreak(getSetElmValue())
-        );
+        getSetElmValue(replaceDeleteBreak(getSetElmValue()));
     }
 }
 var replacePeriodBreak = (n) => {
@@ -289,9 +285,9 @@ function setTitleRewrite(rewrite_change = true) {
 const disableTextareaStr = ["E", "L"];
 function switchTextareaDisabled() {
     elm.disabled = !elm.disabled;
-    document.querySelectorAll("input.switchDisabled").forEach(e=>{
+    document.querySelectorAll("input.switchDisabled").forEach((e) => {
         e.value = disableTextareaStr[Number(elm.disabled)];
-    })
+    });
     elm.focus();
 }
 function insertTextarea(
@@ -400,6 +396,12 @@ elm.addEventListener("paste", (e) => {
     }
     return rt;
 });
+document.body.ondrop = (e) => {
+    if (e.dataTransfer.files.length > 0) {
+        LoadFile(e.dataTransfer.files[0]);
+        return false;
+    }
+};
 document.body.onkeydown = (e) => {
     if (e.code === "Tab" && !(e.ctrlKey || e.altKey)) {
         return !insertTextarea("\t", e.shiftKey);
@@ -410,7 +412,7 @@ document.body.onkeydown = (e) => {
                 case "Enter":
                     if (e.altKey) {
                         confirmReplacePeriodBreak();
-                        return false;                        
+                        return false;
                     }
                 case "KeyS":
                     saveTextarea();
